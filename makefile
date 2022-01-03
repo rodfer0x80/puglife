@@ -12,7 +12,7 @@ debug: puglife.c
 
 .PHONY: run
 run: puglife_webserver
-	./puglife_webserver
+	$(CXX) puglife.c -o puglife_webserver && ./puglife_webserver
 
 .PHONY: clean
 clean:
