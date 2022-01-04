@@ -3,15 +3,15 @@ CXX = gcc
 DEBUG = -g -Wall -Wextra
 
 .PHONY: main
-main: puglife.c 
+main: src/puglife.c 
 	$(CXX) src/puglife.c -o puglife_webserver
 
 .PHONY: debug
-debug: puglife.c
+debug: src/puglife.c
 	$(CXX) $(DEBUG) src/puglife.c -o debug_puglife 2>debug_puglife.log && gdb debug_puglife
 
 .PHONY: run
-run: puglife.c
+run: src/puglife.c
 	$(CXX) src/puglife.c -o puglife_webserver && ./puglife_webserver
 
 .PHONY: test

