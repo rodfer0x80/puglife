@@ -40,19 +40,20 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
             ptr = request+5; // ptr is the URL.
         if(strncmp(request, "POST ", 5) == 0){ // HEAD request
             ptr = request+5; // ptr is the URL.
-            ptr++; // ptr remove ?
-            ptr = ptr+9; // ptr remove wifi_ssd=
-            while (*ptr != "&"){
-                // save wifi ssd to variable
-                ptr++;
-            }
-            ptr++; // ptr remove &
-            while (*ptr != ""){
-                // save wifi password to variable
-                ptr++;
-            }
-            // rewrite grabz.html file with new data
-            // restart webserver
+            // write data to tmp.txt file
+            FILE *fp;
+            fp = fopen("tmp.txt", "w");
+            if(fp == NULL)
+                printf("file can't be opened\n");
+            fprintf(fp, "%s", ptr);
+            fclose(fp);
+            send_string(sockfd, "HTTP/1.1 404 NOT FOUND\r\n"); // evade further data exchange
+            // we safely write the data to a file using a function
+            // someone much smarter already built before
+            // and then use a scripting tool like python to
+            // avoid having to worry with any funny formatting business
+            // without even having to restart the server and with a lot less code
+            system("./write_grabz.py");
         } else {
             if(ptr == NULL) { // Then this is not a recognized request.
                 printf("\t\t UNKNOWN REQUEST\n");
