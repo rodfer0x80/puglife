@@ -38,35 +38,52 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
             ptr = request+4; // ptr is the URL.
         if(strncmp(request, "HEAD ", 5) == 0) // HEAD request
             ptr = request+5; // ptr is the URL.
-        if(ptr == NULL) { // Then this is not a recognized request.
-            printf("\t\t UNKNOWN REQUEST\n");
-        } else { // Valid request, with ptr pointing to the resource name
-            if (ptr[strlen(ptr) - 1] =='/') // For resources ending with '/,
-                strcat(ptr, "index.html");  // add ‘indexhtml' to the end.
-            strcpy(resource, WEBROOT); // Begin resource with web root path
-            strcat(resource, ptr); // and join it with resource path.
-            printf("\t\tOpening %s", resource);
-            if(fd == -1) { // If file is not found
-                printf(" :: 404 Not Found\n");
-                send_string(sockfd, "HTTP/1.1 404 NOT FOUND\r\n");
-                send_string(sockfd, "Server: Puglife webserver\r\n\r\n");
-                send_string(sockfd, "<html><head><title>404 Not Found</title></head>");
-                send_string(sockfd, "<body><h1>URL not found</n1></body></htm|>\r\n");
-            } else {  //Otherwise, serve up the file.
-                printf(" :: 200 OK\n");
-                send_string(sockfd, "HTTP/1.1 200 OK\r\n");
-                send_string(sockfd, "Server: Puglife webserver\r\n\r\n");
-                if(ptr == request + 4) {// Then this is a GET request
-                    if((length = get_file_size(resource)) == -1)
-                        fatal("getting resource file size");
-                    if((ptr = (unsigned char *) ec_malloc(length)) == NULL)
-                        fatal("allocating memory for reading resource");
-                    ptr = read_whole_file(resource); // Read the file into memory.
-                    send(sockfd, ptr, length, 0); // Send it to socket.
-                    free(ptr); // Free file memory.
-                }
-            } // End if block for file found/not found.
-        } // End if block for valid request.
+        if(strncmp(request, "POST ", 5) == 0){ // HEAD request
+            ptr = request+5; // ptr is the URL.
+            ptr++; // ptr remove ?
+            ptr = ptr+9; // ptr remove wifi_ssd=
+            while (*ptr != "&"){
+                // save wifi ssd to variable
+                ptr++;
+            }
+            ptr++; // ptr remove &
+            while (*ptr != ""){
+                // save wifi password to variable
+                ptr++;
+            }
+            // rewrite grabz.html file with new data
+            // restart webserver
+        } else {
+            if(ptr == NULL) { // Then this is not a recognized request.
+                printf("\t\t UNKNOWN REQUEST\n");
+            } else { // Valid request, with ptr pointing to the resource name
+                if (ptr[strlen(ptr) - 1] =='/') // For resources ending with '/,
+                    strcat(ptr, "index.html");  // add ‘indexhtml' to the end.
+                strcpy(resource, WEBROOT); // Begin resource with web root path
+                strcat(resource, ptr); // and join it with resource path.
+                printf("\t\tOpening %s", resource);
+                if(fd == -1) { // If file is not found
+                    printf(" :: 404 Not Found\n");
+                    send_string(sockfd, "HTTP/1.1 404 NOT FOUND\r\n");
+                    send_string(sockfd, "Server: Puglife webserver\r\n\r\n");
+                    send_string(sockfd, "<html><head><title>404 Not Found</title></head>");
+                    send_string(sockfd, "<body><h1>URL not found</n1></body></htm|>\r\n");
+                } else {  //Otherwise, serve up the file.
+                    printf(" :: 200 OK\n");
+                    send_string(sockfd, "HTTP/1.1 200 OK\r\n");
+                    send_string(sockfd, "Server: Puglife webserver\r\n\r\n");
+                    if(ptr == request + 4) {// Then this is a GET request
+                        if((length = get_file_size(resource)) == -1)
+                            fatal("getting resource file size");
+                        if((ptr = (unsigned char *) ec_malloc(length)) == NULL)
+                            fatal("allocating memory for reading resource");
+                        ptr = read_whole_file(resource); // Read the file into memory.
+                        send(sockfd, ptr, length, 0); // Send it to socket.
+                        free(ptr); // Free file memory.
+                    }
+                } // End if block for file found/not found.
+            } // End if block for valid request.
+        } // End POST request drop
     } // End if block for valid HTTP.
     if (shutdown(sockfd, 2) == -1) // Close the socket gracefully.
         fatal("closing connection");
@@ -85,7 +102,7 @@ int main(void) {
         fatal("in socket");
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-        fatal("sSetting socket option SOQ. REUSEADDR'");
+        fatal("Setting socket option SOQ. REUSEADDR'");
 
     host_addr.sin_family=AF_INET; // Host byte order
     host_addr.sin_port=htons(PORT); // Short, network byte order
