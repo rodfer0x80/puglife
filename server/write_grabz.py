@@ -16,8 +16,7 @@ def filter_data(raw_data):
     coupled_data = list()
     wifi_ssd = ""
     wifi_password = ""
-    raw_data = raw_data.split("?")[1] # remove ?
-    raw_data = raw_data[5:]# remove data=
+    raw_data = raw_data[6:]# remove ?data=
     # then for each will be wifi_ssd=$$&wifi_pass=$$&wifi_ssd=$$&wifi_pass=$$
     i = 0
     for param in raw_data.split("&"):
