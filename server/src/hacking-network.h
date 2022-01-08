@@ -43,7 +43,7 @@ int recv_line(int sockfd, unsigned char *dest_buffer) {
         } else {
             eol_matched = 0;
         }
-        ptr++; // Increment the pointer to the next byter.
+        ptr++; // Increment the pointer to the next byte.
     }
     return 0; // Didn't find the end-of-line characters.
 }
