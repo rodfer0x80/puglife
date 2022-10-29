@@ -19,7 +19,7 @@ void fatal(char *message){
     message_size = strlen(message);
 
     if(message_size == 0 | message_size > message_max_size ){
-        strncat(error_message, "unknown", 7);
+        strncat(error_message, "unknown", 8);
     } else {
         strncat(error_message, message, message_size);
     }
